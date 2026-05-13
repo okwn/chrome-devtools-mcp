@@ -205,16 +205,36 @@ export const cliOptions = {
       'Additional arguments for Chrome. Only applies when Chrome is launched by chrome-devtools-mcp.',
   },
   blocklist: {
-    type: 'array',
+    type: 'string',
     describe:
-      'Restricts network access by blocking specified URL patterns (uses https://urlpattern.spec.whatwg.org/). Silently detaches from targets with blocked URLs upon connection, and blocks runtime requests (including navigations and subresources).',
+      'Restricts network access by blocking specified URL patterns (uses https://urlpattern.spec.whatwg.org/). Silently detaches from targets with blocked URLs upon connection, and blocks runtime requests (including navigations and subresources). Supports comma-separated patterns.',
     conflicts: ['allowlist'],
+    coerce: (value: string | string[] | undefined) => {
+      if (!value) {
+        return undefined;
+      }
+      const arr = Array.isArray(value) ? value : [value];
+      return arr
+        .flatMap(val => val.split(','))
+        .map(s => s.trim())
+        .filter(Boolean);
+    },
   },
   allowlist: {
-    type: 'array',
+    type: 'string',
     describe:
-      'Restricts network access by allowing only specified URL patterns (uses https://urlpattern.spec.whatwg.org/). Requires Chrome 149+. Silently detaches from targets with unallowed URLs upon connection, and blocks runtime requests (including navigations and subresources).',
+      'Restricts network access by allowing only specified URL patterns (uses https://urlpattern.spec.whatwg.org/). Requires Chrome 149+. Silently detaches from targets with unallowed URLs upon connection, and blocks runtime requests (including navigations and subresources). Supports comma-separated patterns.',
     conflicts: ['blocklist'],
+    coerce: (value: string | string[] | undefined) => {
+      if (!value) {
+        return undefined;
+      }
+      const arr = Array.isArray(value) ? value : [value];
+      return arr
+        .flatMap(val => val.split(','))
+        .map(s => s.trim())
+        .filter(Boolean);
+    },
   },
   ignoreDefaultChromeArg: {
     type: 'array',

@@ -345,4 +345,31 @@ describe('cli args parsing', () => {
     );
     assert.strictEqual(disabledArgs.performanceCrux, false);
   });
+
+  it('parses blocklist and allowlist flags with comma separation', async () => {
+    const defaultArgs = parseArguments('1.0.0', ['node', 'main.js']);
+    assert.strictEqual(defaultArgs.blocklist, undefined);
+    assert.strictEqual(defaultArgs.allowlist, undefined);
+
+    const blocklistArgs = parseArguments(
+      '1.0.0',
+      [
+        'node',
+        'main.js',
+        '--blocklist=https://example.com/ads/*,https://tracker.com/*',
+      ],
+      {},
+    );
+    assert.deepStrictEqual(blocklistArgs.blocklist, [
+      'https://example.com/ads/*',
+      'https://tracker.com/*',
+    ]);
+
+    const allowlistArgs = parseArguments(
+      '1.0.0',
+      ['node', 'main.js', '--allowlist=https://trusted.com/*'],
+      {},
+    );
+    assert.deepStrictEqual(allowlistArgs.allowlist, ['https://trusted.com/*']);
+  });
 });
