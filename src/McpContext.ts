@@ -30,7 +30,6 @@ import type {
   HTTPRequest,
   Page,
   ScreenRecorder,
-  SerializedAXNode,
   Viewport,
   Target,
   Extension,
