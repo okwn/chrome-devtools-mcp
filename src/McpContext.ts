@@ -55,6 +55,8 @@ interface McpContextOptions {
   experimentalIncludeAllPages?: boolean;
   // Whether CrUX data should be fetched.
   performanceCrux: boolean;
+  // Whether allowlist/blocklist is configured.
+  hasNetworkBlockOrAllowlist?: boolean;
 }
 
 const DEFAULT_TIMEOUT = 5_000;
@@ -308,24 +310,27 @@ export class McpContext implements Context {
     const mcpPage = this.#getMcpPage(page);
     const newSettings: EmulationSettings = {...mcpPage.emulationSettings};
 
-    if (!options.networkConditions) {
-      await page.emulateNetworkConditions(null);
-      delete newSettings.networkConditions;
-    } else if (options.networkConditions === 'Offline') {
-      await page.emulateNetworkConditions({
-        offline: true,
-        download: 0,
-        upload: 0,
-        latency: 0,
-      });
-      newSettings.networkConditions = 'Offline';
-    } else if (options.networkConditions in PredefinedNetworkConditions) {
-      const networkCondition =
-        PredefinedNetworkConditions[
-          options.networkConditions as keyof typeof PredefinedNetworkConditions
-        ];
-      await page.emulateNetworkConditions(networkCondition);
-      newSettings.networkConditions = options.networkConditions;
+    // Skip network emulation if blocklist/allowlist is configured, as it is rejected by Puppeteer.
+    if (!this.#options.hasNetworkBlockOrAllowlist) {
+      if (!options.networkConditions) {
+        await page.emulateNetworkConditions(null);
+        delete newSettings.networkConditions;
+      } else if (options.networkConditions === 'Offline') {
+        await page.emulateNetworkConditions({
+          offline: true,
+          download: 0,
+          upload: 0,
+          latency: 0,
+        });
+        newSettings.networkConditions = 'Offline';
+      } else if (options.networkConditions in PredefinedNetworkConditions) {
+        const networkCondition =
+          PredefinedNetworkConditions[
+            options.networkConditions as keyof typeof PredefinedNetworkConditions
+          ];
+        await page.emulateNetworkConditions(networkCondition);
+        newSettings.networkConditions = options.networkConditions;
+      }
     }
 
     if (!options.cpuThrottlingRate) {
