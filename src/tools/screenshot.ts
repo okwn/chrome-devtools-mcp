@@ -12,7 +12,9 @@ import {definePageTool} from './ToolDefinition.js';
 
 export const screenshot = definePageTool({
   name: 'take_screenshot',
-  description: `Take a screenshot of the page or element.`,
+  description: `Take a screenshot of the page or element.
+
+Usage hint: For full-page screenshots of long pages, set fullPage to true. For capturing specific elements, use the page snapshot tool first to get a uid, then pass it here. Large screenshots (>2MB) are automatically saved to a temp file instead of inlined.`,
   annotations: {
     category: ToolCategory.DEBUGGING,
     // Not read-only due to filePath param.
