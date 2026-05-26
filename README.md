@@ -900,3 +900,6 @@ Please consult [these instructions](./docs/debugging-android.md).
 ## Known limitations
 
 See [Troubleshooting](./docs/troubleshooting.md).
+
+## Contributing
+PRs welcome!
